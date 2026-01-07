@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 class FIFADataCleaner:
 
@@ -110,8 +111,8 @@ class FIFADataCleaner:
         print(self.report)
 
     def fix_column_names(self):
-        # Convert to uppercase
-        self.df.columns = self.df.columns.str.upper()
+        # Convert to lowercase
+        self.df.columns = self.df.columns.str.lower()
 
         # Replace spaces with underscores
         self.df.columns = self.df.columns.str.replace(' ', '_')
@@ -165,6 +166,7 @@ class FIFADataCleaner:
         self.df['Age'] = self.df['Age'].astype('int')
 
         # Make sure all stat columns (Crossing, Finishing, etc.) are int
+        total_stats = 0
         for i in ['Crossing', 'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys',
                   'Dribbling', 'Curve', 'FKAccuracy', 'LongPassing', 'BallControl',
                   'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
@@ -174,6 +176,34 @@ class FIFADataCleaner:
                   'GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']:
             self.df[i] = self.df[i].astype('int')
             self.df[i] = pd.to_numeric(self.df[i], errors = 'coerce')
+            total_stats += self.df[i].notna().sum()
 
+        total_value_wage = 0
         for i in ['Value', 'Wage']:
             self.df[i] = self.df[i].astype('float')
+            total_value_wage += self.df[i].notna().sum()
+
+        # Count total values converted
+        total_age = self.df['Age'].notna().sum()
+        total_converted = total_age + total_stats + total_value_wage
+
+        self.report['fix_data_types'] = total_converted
+
+        print(self.report)
+
+    def create_derived_features(self):
+        #Contract length calculation
+        self.df['contract_length'] = self.df['end_year'] - self.df['start_year']
+
+        #Value per column calculation
+        self.df['value_per_column'] = self.df['value'] / self.df['ova']
+
+        #Conditional based on age using np.where
+        self.df['age_group'] = np.where(self.df['age'] < 25, 'Young',
+                        np.where(self.df['age'] < 30, 'Prime', 'Veteran'))
+
+        #Count
+        new_features = 3 
+
+        self.report['derived_features'] = new_features
+        print(self.report)
