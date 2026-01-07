@@ -24,3 +24,8 @@ class FIFADataCleaner:
             #Replacing M with 000000 ($1000000)
             self.df[i] = self.df[i].str.replace('M', '000000')
 
+            #Converting to float
+            self.df[i] = self.df[i].astype('float')
+
+
+
