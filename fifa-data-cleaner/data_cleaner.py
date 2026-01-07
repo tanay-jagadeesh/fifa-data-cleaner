@@ -14,10 +14,13 @@ class FIFADataCleaner:
         print(self.df.head())
 
     def clean_value_wage_clause(self):
-        #Removing Pound Symbol
         for i in ['Value', 'Wage', 'Release Clause']:
+            #Removing Pound Symbol
             self.df[i] = self.df[i].str.replace('€', '')
-        #Multiplying by ($)1000 if ends with K
-        for i in ['Value', 'Wage', 'Release Clause']:
+
+            #Replacing K with 000 ($1000)
             self.df[i] = self.df[i].str.replace('K', '000')
+
+            #Replacing M with 000000 ($1000000)
+            self.df[i] = self.df[i].str.replace('M', '000000')
 
