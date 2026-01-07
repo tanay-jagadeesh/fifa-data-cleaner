@@ -64,3 +64,26 @@ class FIFADataCleaner:
         self.report['height_weight_cleaned'] = self.df[['Height', 'Weight']].notna().count()
 
         print(self.report)
+
+    def clean_contract_dates(self):
+        #Made contract_start and contract_end
+
+        split_contract = self.df['Contract'].str.split('~', expand = True)
+
+        self.df['contract_start'] = pd.to_numeric(split_contract[0], errors = 'coerce')
+
+        self.df['contract_end'] = pd.to_numeric(split_contract[1], errors = 'coerce')
+
+        #Filled missing values
+        self.df['contract_start'] = self.df['contract_start'].fillna('Free Agent')
+        self.df['contract_end'] = self.df['contract_end'].fillna('Free Agent')
+
+        #Count total pparsed
+        total_start = self.df['contract_start'].notna().sum()
+        total_end = self.df['contract_end'].notna().sum()
+
+        total_parsed = total_start + total_end
+
+        #Added result to dictionary
+        self.report['contract_dates_parsed'] = total_parsed
+        print(self.report)
