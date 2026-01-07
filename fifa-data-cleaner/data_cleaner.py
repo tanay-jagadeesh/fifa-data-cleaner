@@ -89,20 +89,39 @@ class FIFADataCleaner:
         print(self.report)
 
     def handle_missing_values(self):
-        
+        #Missing Before
         missing_before = self.df.isnull().sum().sum()
 
+        #Filling Data
         self.df['Loan Date End'] = self.df['Loan Date End'].fillna('Not on Loan')
 
         self.df['Hits'] = self.df['Hits'].fillna(0)
 
         self.df = self.df.fillna(0)
 
+        #Missing After
         missing_after = self.df.isnull().sum().sum()
 
         total_filled = missing_before - missing_after
 
+        #Assigning the missing values filed to total_filled
         self.report['handle_missing_values'] = total_filled
 
         print(self.report)
-        
+
+    def fix_column_names(self):
+        # Convert to uppercase
+        self.df.columns = self.df.columns.str.upper()
+
+        # Replace spaces with underscores
+        self.df.columns = self.df.columns.str.replace(' ', '_')
+
+        # Remove special characters 
+        self.df.columns = self.df.columns.str.replace('[^a-z0-9_]', '', regex=True)
+
+        total_columns = len(self.df.columns)
+
+        self.report['columns_renamed'] = total_columns
+
+        print(self.report)
+
