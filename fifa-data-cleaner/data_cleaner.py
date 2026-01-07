@@ -237,3 +237,37 @@ class FIFADataCleaner:
         print(f"Total time: {total_time:.2f} seconds")
         print("\nFinal Report:")
         print(self.report)
+    
+    def generate_report(self):
+        print("FIFA DATA CLEANING REPORT")
+
+        # Original rows vs final rows
+        final_rows = len(self.df)
+        print(f"\nOriginal rows: {self.count}")
+        print(f"Final rows: {final_rows}")
+
+        # Columns before vs after
+        final_columns = len(self.df.columns)
+        print(f"\nFinal columns: {final_columns}")
+
+        # Currency conversions done
+        print(f"\nCurrency conversions done: {self.report.get('value_wage_clause', 'N/A')}")
+
+        # Height/weight conversions done
+        print(f"Height/weight conversions done: {self.report.get('height_weight_cleaned', 'N/A')}")
+
+        # Contract dates parsed
+        print(f"Contract dates parsed: {self.report.get('contract_dates_parsed', 'N/A')}")
+
+        # Missing values filled
+        print(f"Missing values filled: {self.report.get('handle_missing_values', 'N/A')}")
+
+        # Column names fixed
+        print(f"Column names fixed: {self.report.get('columns_renamed', 'N/A')}")
+
+        # Data quality score
+        total_cells = self.df.shape[0] * self.df.shape[1]
+        non_null_cells = self.df.notna().sum().sum()
+        quality_score = (non_null_cells / total_cells) * 100
+
+        print(f"\nData quality score: {quality_score:.2f}%")
