@@ -125,3 +125,25 @@ class FIFADataCleaner:
 
         print(self.report)
 
+    def fix_star_ratings(self):
+        #Replace Star Ratings/Convert to int
+        self.df['W/F'] = self.df['W/F'].str.replace('★', '')
+
+        self.df['W/F'] = self.df['W/F'].astype('int')
+
+        self.df['SM'] = self.df['SM'].str.replace('★', '')
+
+        self.df['SM'] = self.df['SM'].astype('int')
+
+        #Count total converted
+        total_wf = self.df['W/F'].notna().sum()
+
+        total_sm = self.df['SM'].notna().sum()
+
+        total_ratings = total_wf + total_sm
+
+        #Assign it to total_ratings
+        self.report['star_ratings'] = total_ratings
+
+        print(self.report) 
+
