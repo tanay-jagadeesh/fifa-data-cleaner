@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import time
 
 class FIFADataCleaner:
 
@@ -203,7 +204,36 @@ class FIFADataCleaner:
                         np.where(self.df['age'] < 30, 'Prime', 'Veteran'))
 
         #Count
-        new_features = 3 
+        new_features = 3
 
         self.report['derived_features'] = new_features
+        print(self.report)
+
+    def clean(self):
+
+        # Print header
+        print("Starting FIFA Data Cleaning Process")
+
+        # Track start time
+        start_time = time.time()
+
+        # Call all cleaning methods in order
+        self.clean_value_wage_clause()
+        self.clean_height_weight()
+        self.clean_contract_dates()
+        self.handle_missing_values()
+        self.fix_column_names()
+        self.fix_star_ratings()
+        self.remove_url_columns()
+        self.fix_data_types()
+        self.create_derived_features()
+
+        # Track end time
+        end_time = time.time()
+        total_time = end_time - start_time
+
+        # Print footer
+        print(f"Data Cleaning Complete!")
+        print(f"Total time: {total_time:.2f} seconds")
+        print("\nFinal Report:")
         print(self.report)
