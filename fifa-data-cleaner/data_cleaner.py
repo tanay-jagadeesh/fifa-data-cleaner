@@ -40,7 +40,8 @@ class FIFADataCleaner:
         split_values = self.df.loc[mask, 'Height'].str.split("'", expand = True)
 
         feet_in_cm = split_values[0].astype(float) * 30.48
-        inches_in_cm = split_values[1].astype(float) * 2.54
+        # Remove quote marks from inches before converting
+        inches_in_cm = split_values[1].str.replace('"', '').astype(float) * 2.54
         total_cm = feet_in_cm + inches_in_cm
 
         self.df.loc[mask,'Height'] = total_cm
@@ -129,18 +130,19 @@ class FIFADataCleaner:
 
     def fix_star_ratings(self):
         #Replace Star Ratings/Convert to int
-        self.df['W/F'] = self.df['W/F'].str.replace('★', '')
+        # Note: column names are now lowercase after fix_column_names()
+        self.df['wf'] = self.df['wf'].str.replace('★', '')
 
-        self.df['W/F'] = self.df['W/F'].astype('int')
+        self.df['wf'] = self.df['wf'].astype('int')
 
-        self.df['SM'] = self.df['SM'].str.replace('★', '')
+        self.df['sm'] = self.df['sm'].str.replace('★', '')
 
-        self.df['SM'] = self.df['SM'].astype('int')
+        self.df['sm'] = self.df['sm'].astype('int')
 
         #Count total converted
-        total_wf = self.df['W/F'].notna().sum()
+        total_wf = self.df['wf'].notna().sum()
 
-        total_sm = self.df['SM'].notna().sum()
+        total_sm = self.df['sm'].notna().sum()
 
         total_ratings = total_wf + total_sm
 
@@ -152,7 +154,8 @@ class FIFADataCleaner:
     def remove_url_columns(self):
         total_before = len(self.df.columns)
 
-        self.df = self.df.drop(columns = ['photoUrl', 'playerUrl'])
+        # Note: column names are now lowercase after fix_column_names()
+        self.df = self.df.drop(columns = ['photourl', 'playerurl'])
 
         total_after = len(self.df.columns)
 
@@ -163,29 +166,30 @@ class FIFADataCleaner:
         print(self.report)
 
     def fix_data_types(self):
-        # Make sure Age is int
-        self.df['Age'] = self.df['Age'].astype('int')
+        # Note: column names are now lowercase after fix_column_names()
+        # Make sure age is int
+        self.df['age'] = self.df['age'].astype('int')
 
-        # Make sure all stat columns (Crossing, Finishing, etc.) are int
+        # Make sure all stat columns (crossing, finishing, etc.) are int
         total_stats = 0
-        for i in ['Crossing', 'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys',
-                  'Dribbling', 'Curve', 'FKAccuracy', 'LongPassing', 'BallControl',
-                  'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
-                  'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots',
-                  'Aggression', 'Interceptions', 'Positioning', 'Vision', 'Penalties',
-                  'Composure', 'Marking', 'StandingTackle', 'SlidingTackle',
-                  'GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']:
+        for i in ['crossing', 'finishing', 'heading_accuracy', 'short_passing', 'volleys',
+                  'dribbling', 'curve', 'fk_accuracy', 'long_passing', 'ball_control',
+                  'acceleration', 'sprint_speed', 'agility', 'reactions', 'balance',
+                  'shot_power', 'jumping', 'stamina', 'strength', 'long_shots',
+                  'aggression', 'interceptions', 'positioning', 'vision', 'penalties',
+                  'composure', 'marking', 'standing_tackle', 'sliding_tackle',
+                  'gk_diving', 'gk_handling', 'gk_kicking', 'gk_positioning', 'gk_reflexes']:
             self.df[i] = self.df[i].astype('int')
             self.df[i] = pd.to_numeric(self.df[i], errors = 'coerce')
             total_stats += self.df[i].notna().sum()
 
         total_value_wage = 0
-        for i in ['Value', 'Wage']:
+        for i in ['value', 'wage']:
             self.df[i] = self.df[i].astype('float')
             total_value_wage += self.df[i].notna().sum()
 
         # Count total values converted
-        total_age = self.df['Age'].notna().sum()
+        total_age = self.df['age'].notna().sum()
         total_converted = total_age + total_stats + total_value_wage
 
         self.report['fix_data_types'] = total_converted
@@ -193,11 +197,14 @@ class FIFADataCleaner:
         print(self.report)
 
     def create_derived_features(self):
-        #Contract length calculation
-        self.df['contract_length'] = self.df['end_year'] - self.df['start_year']
+        # Note: column names are now lowercase after fix_column_names()
+        #Contract length calculation (convert to numeric first, handle 'Free Agent')
+        contract_start_numeric = pd.to_numeric(self.df['contract_start'], errors='coerce')
+        contract_end_numeric = pd.to_numeric(self.df['contract_end'], errors='coerce')
+        self.df['contract_length'] = contract_end_numeric - contract_start_numeric
 
-        #Value per column calculation
-        self.df['value_per_column'] = self.df['value'] / self.df['ova']
+        #Value per overall calculation
+        self.df['value_per_overall'] = self.df['value'] / self.df['ova']
 
         #Conditional based on age using np.where
         self.df['age_group'] = np.where(self.df['age'] < 25, 'Young',
