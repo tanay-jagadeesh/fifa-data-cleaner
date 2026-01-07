@@ -159,3 +159,21 @@ class FIFADataCleaner:
         self.report['columns_dropped'] = total
 
         print(self.report)
+
+    def fix_data_types(self):
+        # Make sure Age is int
+        self.df['Age'] = self.df['Age'].astype('int')
+
+        # Make sure all stat columns (Crossing, Finishing, etc.) are int
+        for i in ['Crossing', 'Finishing', 'HeadingAccuracy', 'ShortPassing', 'Volleys',
+                  'Dribbling', 'Curve', 'FKAccuracy', 'LongPassing', 'BallControl',
+                  'Acceleration', 'SprintSpeed', 'Agility', 'Reactions', 'Balance',
+                  'ShotPower', 'Jumping', 'Stamina', 'Strength', 'LongShots',
+                  'Aggression', 'Interceptions', 'Positioning', 'Vision', 'Penalties',
+                  'Composure', 'Marking', 'StandingTackle', 'SlidingTackle',
+                  'GKDiving', 'GKHandling', 'GKKicking', 'GKPositioning', 'GKReflexes']:
+            self.df[i] = self.df[i].astype('int')
+            self.df[i] = pd.to_numeric(self.df[i], errors = 'coerce')
+
+        for i in ['Value', 'Wage']:
+            self.df[i] = self.df[i].astype('float')
