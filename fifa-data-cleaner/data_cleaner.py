@@ -87,3 +87,22 @@ class FIFADataCleaner:
         #Added result to dictionary
         self.report['contract_dates_parsed'] = total_parsed
         print(self.report)
+
+    def handle_missing_values(self):
+        
+        missing_before = self.df.isnull().sum().sum()
+
+        self.df['Loan Date End'] = self.df['Loan Date End'].fillna('Not on Loan')
+
+        self.df['Hits'] = self.df['Hits'].fillna(0)
+
+        self.df = self.df.fillna(0)
+
+        missing_after = self.df.isnull().sum().sum()
+
+        total_filled = missing_before - missing_after
+
+        self.report['handle_missing_values'] = total_filled
+
+        print(self.report)
+        
