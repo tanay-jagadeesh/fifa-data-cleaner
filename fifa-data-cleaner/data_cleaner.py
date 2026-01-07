@@ -271,3 +271,10 @@ class FIFADataCleaner:
         quality_score = (non_null_cells / total_cells) * 100
 
         print(f"\nData quality score: {quality_score:.2f}%")
+
+    def save_clean_csv(self):
+        #Converting dataframe to csv 
+        self.df.to_csv('fifa-data-cleaner/fifa21_clean_data.csv', index=False)
+
+        print("Successfully saved cleaned data to fifa21_clean_data.csv")
+
