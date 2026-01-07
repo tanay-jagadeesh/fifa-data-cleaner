@@ -27,5 +27,8 @@ class FIFADataCleaner:
             #Converting to float
             self.df[i] = self.df[i].astype('float')
 
+        self.report = self.df[['Value', 'Wage', 'Release Clause']].notna().count()
+
+        print(self.report)
 
 
