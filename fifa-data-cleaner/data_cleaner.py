@@ -27,8 +27,40 @@ class FIFADataCleaner:
             #Converting to float
             self.df[i] = self.df[i].astype('float')
 
-        self.report = self.df[['Value', 'Wage', 'Release Clause']].notna().count()
+        self.report['value_wage_clause'] = self.df[['Value', 'Wage', 'Release Clause']].notna().count()
 
         print(self.report)
 
+    def clean_height_weight(self):
+        #Convert feet/inches to cm
+        mask = self.df['Height'].str.contains("'")
 
+        split_values = self.df.loc[mask, 'Height'].str.split("'", expand = True)
+
+        feet_in_cm = split_values[0].astype(float) * 30.48
+        inches_in_cm = split_values[1].astype(float) * 2.54
+        total_cm = feet_in_cm + inches_in_cm
+
+        self.df.loc[mask,'Height'] = total_cm
+
+        #Convert lbs to kgs 
+
+        mask_2 = self.df['Weight'].str.contains('lbs')
+
+        total_kg = self.df.loc[mask_2, 'Weight'].str.replace('lbs', '').astype(float) * 0.453592
+
+        self.df.loc[mask_2, 'Weight'] = total_kg
+
+        #Replacing cm
+        self.df['Height'] = self.df['Height'].str.replace('cm', '')
+
+        #Replacing kg
+        self.df['Weight'] = self.df['Weight'].str.replace('kg', '')
+
+        #Converting to float
+        self.df['Height'] = self.df['Height'].astype('float')
+        self.df['Weight'] = self.df['Weight'].astype('float')
+
+        self.report['height_weight_cleaned'] = self.df[['Height', 'Weight']].notna().count()
+
+        print(self.report)
