@@ -147,3 +147,15 @@ class FIFADataCleaner:
 
         print(self.report) 
 
+    def remove_url_columns(self):
+        total_before = len(self.df.columns)
+
+        self.df = self.df.drop(columns = ['photoUrl', 'playerUrl'])
+
+        total_after = len(self.df.columns)
+
+        total = total_before - total_after
+
+        self.report['columns_dropped'] = total
+
+        print(self.report)
